@@ -36,6 +36,13 @@ jobs:
           uv tool install poetry --quiet 
           uv venv .venv
 
+      - name: bump version.prerelease
+        run: |
+          source .venv/bin/activate
+          poetry version prerelease
+          poetry version --short > .version.txt
+          echo "Bumped version to $(cat .version.txt)"
+
       - name: test
         run: |
           source .venv/bin/activate
