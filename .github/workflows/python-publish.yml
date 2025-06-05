@@ -34,10 +34,11 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Setup uv
+        uses: andgineer/uv-venv@v3
+
       - name: install tools
         run: |
-          # install uv
-          curl -LsSf https://astral.sh/uv/install.sh | sh
           uv tool install poetry --quiet 
           uv venv .venv
 
@@ -78,14 +79,16 @@ jobs:
         with:
           fetch-depth: '0'
 
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
+      - name: Setup uv
+        uses: andgineer/uv-venv@v3
+
       - name: install tools
         run: |
-          # install uv
-          curl -LsSf https://astral.sh/uv/install.sh | sh
           uv tool install poetry --quiet 
           uv venv .venv
 
@@ -132,10 +135,11 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Setup uv
+        uses: andgineer/uv-venv@v3
+
       - name: install tools
         run: |
-          # install uv
-          curl -LsSf https://astral.sh/uv/install.sh | sh
           uv tool install poetry --quiet 
           uv venv .venv
 
