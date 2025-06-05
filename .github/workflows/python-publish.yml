@@ -46,11 +46,7 @@ jobs:
       - name: bump version.prerelease
         shell: bash
         run: |
-          if [ "$RUNNER_OS" = "Windows" ]; then
-            .venv/Scripts/activate
-          else
-            source .venv/bin/activate
-          fi
+          source .venv/bin/activate
           poetry version prerelease
           poetry version --short > .version.txt
           echo "Bumped version to $(cat .version.txt)"
@@ -58,11 +54,8 @@ jobs:
       - name: run tests
         shell: bash
         run: |
-          if [ "$RUNNER_OS" = "Windows" ]; then
-            .venv\Scripts\activate
-          else
-            source .venv/bin/activate
-          fi
+          source .venv/bin/activate
+
           poetry install --with test
           pytest 
 
@@ -96,12 +89,7 @@ jobs:
       - name: bump version.prerelease
         shell: bash
         run: |
-          if [ "$RUNNER_OS" = "Windows" ]; then
-            .venv\Scripts\activate
-          else
-            source .venv/bin/activate
-          fi
-
+          source .venv/bin/activate
           poetry version prerelease
           poetry version --short > .version.txt
           VERSION="v$(cat .version.txt)"
