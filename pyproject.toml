@@ -1,0 +1,48 @@
+[project]
+name = "auto-release-snake"
+version = "0.1.0"
+description = "Testing automated releases"
+authors = [
+    {name = "Jos Verlinde",email = "Jos.Verlinde@Microsoft.com"}
+]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    # "mpremote (>=1.25.0,<2.0.0)"
+]
+
+
+[tool.poetry]
+name = "auto_release_snake"
+packages = [{ include = "**/auto_release_snake/*.*" }]
+include = []
+exclude = [
+    "**/tests/**",
+    "**/.git/*.*",
+    "**/test_*.py", 
+    "**/*_test.py",
+]    
+
+[tool.poetry.scripts]
+snake = "auto_release_snake:cli.snake"
+
+[tool.poetry.group.test]
+optional = true
+[tool.poetry.group.test.dependencies]
+pytest = "^7.1.2"
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+python_functions = ["test_", "*_test"]
+python_files = ["test_*.py", "*_test.py"]
+# testpaths = [
+#     "tests",
+
+# ]
