@@ -17,9 +17,85 @@ permissions:
   contents: read
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: '0'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: install tools
+        run: |
+          # install uv
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          uv tool install poetry --quiet 
+          uv venv .venv
+
+      # bump version - but do not commit this yet
+      - name: bump version.prerelease
+        run: |
+          source .venv/bin/activate
+          poetry version prerelease
+          poetry version --short > .version.txt
+          echo "Bumped version to $(cat .version.txt)"
+
+      - name: test
+        run: |
+          source .venv/bin/activate
+          poetry install --with test
+          pytest 
+
+
+  bump-version:
+    runs-on: ubuntu-latest
+    needs:
+      - test
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: '0'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: install tools
+        run: |
+          # install uv
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          uv tool install poetry --quiet 
+          uv venv .venv
+
+      # bump version and commit
+      - name: bump version.prerelease
+        run: |
+          source .venv/bin/activate
+          poetry version prerelease
+          poetry version --short > .version.txt
+          echo "Bumped version to $(cat .version.txt)"
+
+      - name: Commit version bump
+        if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch --all
+          git checkout ${{ github.ref_name }}
+          git add pyproject.toml 
+          git commit -m "ci: bump version [skip ci]" || echo "No changes to commit"
+          git push
+
   release-build:
     runs-on: ubuntu-latest
-
+    needs:
+      - bump-version
     steps:
       - uses: actions/checkout@v4
         with:
