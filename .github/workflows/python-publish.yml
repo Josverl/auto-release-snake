@@ -73,13 +73,18 @@ jobs:
           uv tool install poetry --quiet 
           uv venv .venv
 
-      # bump version and commit
+      # bump version and set tag
       - name: bump version.prerelease
         run: |
           source .venv/bin/activate
           poetry version prerelease
           poetry version --short > .version.txt
-          echo "Bumped version to $(cat .version.txt)"
+          VERSION="v$(cat .version.txt)"
+          echo "Bumped version to ${VERSION}"
+          # set tag
+          git tag "$VERSION"
+          git push origin "$VERSION"
+
 
       - name: Commit version bump
         if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
