@@ -9,6 +9,7 @@
 name: Upload Python Package
 
 on:
+  workflow_dispatch:
   release:
     types: [published]
 
@@ -26,10 +27,22 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: install tools
+        run: |
+          # install uv
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          uv tool install poetry
+          uv venv .venv
+
+      - name: test
+        run: |
+          source .venv/bin/activate
+          poetry install
+          pytest 
+
       - name: Build release distributions
         run: |
-          # NOTE: put your own distribution build steps here.
-          python -m pip install build
+          source .venv/bin/activate
           poetry build --format wheel
 
       - name: Upload distributions
