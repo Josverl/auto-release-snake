@@ -43,15 +43,25 @@ jobs:
 
       # bump version - but do not commit this yet
       - name: bump version.prerelease
+        shell: bash
         run: |
-          source .venv/bin/activate
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            .venv\Scripts\activate
+          else
+            source .venv/bin/activate
+          fi
           poetry version prerelease
           poetry version --short > .version.txt
           echo "Bumped version to $(cat .version.txt)"
 
       - name: run tests
+        shell: bash
         run: |
-          source .venv/bin/activate
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            .venv\Scripts\activate
+          else
+            source .venv/bin/activate
+          fi
           poetry install --with test
           pytest 
 
@@ -81,8 +91,14 @@ jobs:
 
       # bump version and set tag
       - name: bump version.prerelease
+        shell: bash
         run: |
-          source .venv/bin/activate
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            .venv\Scripts\activate
+          else
+            source .venv/bin/activate
+          fi
+
           poetry version prerelease
           poetry version --short > .version.txt
           VERSION="v$(cat .version.txt)"
