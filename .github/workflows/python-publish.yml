@@ -22,7 +22,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-13]
-        python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13"]  
+        # python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13"]  
+        python-version: [ "3.13"]  
     name: Python ${{ matrix.python-version }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     steps:
@@ -36,7 +37,8 @@ jobs:
 
       - name: Install the latest version of uv
         uses: astral-sh/setup-uv@v6
-
+        with:
+          activate-environment: true
       - name: install tools
         run: |
           uv tool install poetry --quiet 
@@ -46,7 +48,7 @@ jobs:
       - name: bump version.prerelease
         shell: bash
         run: |
-          source .venv/bin/activate
+          # source .venv/bin/activate
           poetry version prerelease
           poetry version --short > .version.txt
           echo "Bumped version to $(cat .version.txt)"
@@ -54,8 +56,7 @@ jobs:
       - name: run tests
         shell: bash
         run: |
-          source .venv/bin/activate
-
+          # source .venv/bin/activate
           poetry install --with test
           pytest 
 
@@ -79,6 +80,8 @@ jobs:
 
       - name: Install the latest version of uv
         uses: astral-sh/setup-uv@v6
+        with:
+          activate-environment: true
 
       - name: install tools
         run: |
@@ -89,7 +92,7 @@ jobs:
       - name: bump version.prerelease
         shell: bash
         run: |
-          source .venv/bin/activate
+          # source .venv/bin/activate
           poetry version prerelease
           poetry version --short > .version.txt
           VERSION="v$(cat .version.txt)"
@@ -125,7 +128,8 @@ jobs:
 
       - name: Install the latest version of uv
         uses: astral-sh/setup-uv@v6
-
+        with:
+          activate-environment: true
 
       - name: install tools
         run: |
@@ -134,20 +138,20 @@ jobs:
 
       - name: bump version.prerelease
         run: |
-          source .venv/bin/activate
+          # source .venv/bin/activate
           poetry version prerelease
           poetry version --short > .version.txt
           echo "Bumped version to $(cat .version.txt)"
 
       - name: test
         run: |
-          source .venv/bin/activate
+          # source .venv/bin/activate
           poetry install --with test
           pytest 
 
       - name: Build release distributions
         run: |
-          source .venv/bin/activate
+          # source .venv/bin/activate
           poetry build --format wheel
 
       - name: Upload distributions
