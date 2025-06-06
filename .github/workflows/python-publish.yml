@@ -59,7 +59,7 @@ jobs:
         run: |
           poetry version --short > .version.txt
           echo "Version is: v$(poetry version --short)"
-          echo "version=$(poetry version --short) >> $GITHUB_OUTPUT"
+          echo "version=$(poetry version --short)" >> $GITHUB_OUTPUT
 
       - name: run tests
         shell: bash
@@ -105,7 +105,7 @@ jobs:
         run: |
           poetry version --short > .version.txt
           echo "Version is: v$(poetry version --short)"
-          echo "version=$(poetry version --short) >> $GITHUB_OUTPUT"
+          echo "version=$(poetry version --short)" >> $GITHUB_OUTPUT
 
       - name: Commit updated version
         run: |
