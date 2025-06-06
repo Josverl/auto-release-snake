@@ -9,6 +9,7 @@
 name: Upload Python Package
 
 on:
+  push: # during tests
   workflow_dispatch:
   release:
     types: [published]
@@ -38,7 +39,9 @@ jobs:
       - name: Install the latest version of uv
         uses: astral-sh/setup-uv@v6
         with:
+          # Note: https://github.com/marketplace/actions/astral-sh-setup-uv#activate-environment
           activate-environment: true
+
       - name: install tools
         run: |
           uv tool install poetry --quiet 
@@ -47,11 +50,16 @@ jobs:
       # bump version - but do not commit this yet
       - name: bump version.prerelease
         shell: bash
+        run: poetry version prerelease
+
+      # get version
+      - name: get poetry version
+        id: poetry
+        shell: bash
         run: |
-          # source .venv/bin/activate
-          poetry version prerelease
           poetry version --short > .version.txt
-          echo "Bumped version to $(cat .version.txt)"
+          echo "Version is: v$(poetry version --short)"
+          echo "version=$(poetry version --short) >> $GITHUB_OUTPUT"
 
       - name: run tests
         shell: bash
@@ -73,7 +81,6 @@ jobs:
         with:
           fetch-depth: '0'
 
-
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -88,29 +95,35 @@ jobs:
           uv tool install poetry --quiet 
           uv venv .venv
 
-      # bump version and set tag
       - name: bump version.prerelease
         shell: bash
+        run: poetry version prerelease
+
+      - name: get poetry version
+        id: poetry
+        shell: bash
         run: |
-          # source .venv/bin/activate
-          poetry version prerelease
           poetry version --short > .version.txt
-          VERSION="v$(cat .version.txt)"
-          echo "Bumped version to ${VERSION}"
-          # set tag
-          git tag "$VERSION"
-          git push origin "$VERSION"
+          echo "Version is: v$(poetry version --short)"
+          echo "version=$(poetry version --short) >> $GITHUB_OUTPUT"
 
-
-      - name: Commit version bump
+      - name: Commit updated version
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git fetch --all
           git checkout ${{ github.ref_name }}
           git add pyproject.toml 
-          git commit -m "ci: bump version [skip ci]" || echo "No changes to commit"
+          git commit -m "ci: bump version to ${{ steps.poetry.outputs.version }} [skip ci]" || echo "No changes to commit"
           git push
+
+      - name: Set tag to v{version}
+        shell: bash
+        run: |
+          echo "Bumped version to ${{ steps.poetry.outputs.version }}"
+          # set tag with v prefix
+          git tag "v${{ steps.poetry.outputs.version }}"
+          git push origin "v${{ steps.poetry.outputs.version }}"
 
   build-release:
     if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
